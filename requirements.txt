@@ -28,14 +28,14 @@ rich>=13.0.0  # For beautiful CLI output
 
 # Logging and monitoring
 loguru>=0.7.0
-pydantic-logfire>=0.15.0  # Optional: Advanced monitoring
+pydantic-logfire>=0.0.1  # Optional: Advanced monitoring
 
 # HTTP requests (for API integrations)
 httpx>=0.25.0
 requests>=2.31.0
 
 # Data processing
-python-decimal>=1.0.0
+# decimal is built-in to Python
 
 # Configuration and environment
 python-dotenv>=1.0.0
@@ -63,6 +63,6 @@ ujson>=5.8.0
 # uuid is built-in
 
 # Async support
-asyncio-mqtt>=0.13.0  # If MQTT integration needed
+# asyncio-mqtt>=0.13.0  # If MQTT integration needed (optional)
 aiofiles>=23.2.0  # For async file operations
 
