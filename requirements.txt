@@ -1,0 +1,67 @@
+# Receipt Processing Application - Python Dependencies
+
+# Core framework and AI
+pydantic>=2.5.0
+pydantic-ai>=0.0.13
+pydantic-settings>=2.1.0
+
+# AI Vision APIs
+openai>=1.10.0
+anthropic>=0.8.0
+
+# Image processing
+Pillow>=10.0.0
+
+# File system monitoring
+watchdog>=3.0.0
+
+# Date and time handling
+python-dateutil>=2.8.0
+
+# Email functionality
+aiosmtplib>=2.0.0
+email-validator>=2.1.0
+
+# CLI framework
+click>=8.1.0
+rich>=13.0.0  # For beautiful CLI output
+
+# Logging and monitoring
+loguru>=0.7.0
+pydantic-logfire>=0.15.0  # Optional: Advanced monitoring
+
+# HTTP requests (for API integrations)
+httpx>=0.25.0
+requests>=2.31.0
+
+# Data processing
+python-decimal>=1.0.0
+
+# Configuration and environment
+python-dotenv>=1.0.0
+
+# Development and testing dependencies (optional)
+pytest>=7.4.0
+pytest-cov>=4.1.0
+pytest-asyncio>=0.21.0
+black>=23.0.0
+flake8>=6.0.0
+mypy>=1.7.0
+pre-commit>=3.5.0
+
+# Documentation (optional)
+mkdocs>=1.5.0
+mkdocs-material>=9.4.0
+
+# Performance monitoring (optional)
+psutil>=5.9.0
+
+# JSON handling (built-in json module is sufficient, but ujson for performance)
+ujson>=5.8.0
+
+# UUID generation (built-in uuid module is sufficient)
+# uuid is built-in
+
+# Async support
+asyncio-mqtt>=0.13.0  # If MQTT integration needed
+aiofiles>=23.2.0  # For async file operations
