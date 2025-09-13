@@ -65,3 +65,4 @@ ujson>=5.8.0
 # Async support
 asyncio-mqtt>=0.13.0  # If MQTT integration needed
 aiofiles>=23.2.0  # For async file operations
+
