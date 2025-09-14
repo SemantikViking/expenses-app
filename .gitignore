@@ -99,6 +99,8 @@ receipt_processing_log_*.json
 # Processed receipts (if storing locally)
 processed_receipts/
 backup_receipts/
+screenshorts/
+tests/screenshorts/
 
 # Email templates (if containing sensitive info)
 templates/sensitive/
