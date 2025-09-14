@@ -42,33 +42,33 @@ This task list covers the complete development of the receipt processing applica
 
 ## Phase 2: Core Components Development
 
-### T004: File System Monitoring [ ]
-- [ ] Implement folder monitoring using watchdog
-- [ ] Add support for multiple image formats (JPG, PNG, HEIC)
-- [ ] Create file validation and filtering logic
-- [ ] Add error handling for file system events
-- [ ] Implement batch processing for existing files
+### T004: File System Monitoring [✅]
+- [x] Implement folder monitoring using watchdog
+- [x] Add support for multiple image formats (JPG, PNG, HEIC)
+- [x] Create file validation and filtering logic
+- [x] Add error handling for file system events
+- [x] Implement batch processing for existing files
 
-### T005: Image Processing Module [ ]
-- [ ] Create image loading and validation functions
-- [ ] Add image preprocessing (resize, enhance quality)
-- [ ] Implement image format conversion if needed
-- [ ] Add error handling for corrupted images
-- [ ] Create image metadata extraction
+### T005: Image Processing Module [✅]
+- [x] Create image loading and validation functions
+- [x] Add image preprocessing (resize, enhance quality)
+- [x] Implement image format conversion if needed
+- [x] Add error handling for corrupted images
+- [x] Create image metadata extraction
 
-### T006: AI Vision Integration [ ]
-- [ ] Set up Pydantic AI with vision models (OpenAI GPT-4V)
-- [ ] Create structured prompts for receipt data extraction
-- [ ] Implement ReceiptData Pydantic model validation
-- [ ] Add confidence scoring and error handling
-- [ ] Create fallback mechanisms for API failures
+### T006: AI Vision Integration [✅]
+- [x] Set up Pydantic AI with vision models (OpenAI GPT-4V)
+- [x] Create structured prompts for receipt data extraction
+- [x] Implement ReceiptData Pydantic model validation
+- [x] Add confidence scoring and error handling
+- [x] Create fallback mechanisms for API failures
 
-### T007: Data Parsing & Validation [ ]
-- [ ] Implement vendor name cleaning and standardization
-- [ ] Create date parsing with multiple format support
-- [ ] Add amount extraction with currency detection
-- [ ] Implement data validation using Pydantic models
-- [ ] Add confidence threshold filtering
+### T007: Data Parsing & Validation [✅]
+- [x] Implement vendor name cleaning and standardization
+- [x] Create date parsing with multiple format support
+- [x] Add amount extraction with currency detection
+- [x] Implement data validation using Pydantic models
+- [x] Add confidence threshold filtering
 
 ---
 
