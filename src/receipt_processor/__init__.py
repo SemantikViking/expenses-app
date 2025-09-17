@@ -53,6 +53,13 @@ from .status_tracker import (
     ErrorCategorizer, ProcessingMetrics, ErrorCategory, RetryStrategy
 )
 
+# Import reporting module
+from .reporting import (
+    FilterOperator, SortDirection, FilterCondition, SortCondition, QueryOptions,
+    ReportSummary, VendorAnalysis, WorkflowMetrics, LogFilter, LogSorter,
+    LogQueryEngine, ReportGenerator, ExportManager, AnalyticsEngine
+)
+
 # Note: Additional imports will be added as modules are implemented
 # from .cli import cli  # CLI is imported separately to avoid circular imports
 
@@ -107,6 +114,20 @@ __all__ = [
     "ProcessingMetrics",
     "ErrorCategory",
     "RetryStrategy",
+    "FilterOperator",
+    "SortDirection",
+    "FilterCondition",
+    "SortCondition",
+    "QueryOptions",
+    "ReportSummary",
+    "VendorAnalysis",
+    "WorkflowMetrics",
+    "LogFilter",
+    "LogSorter",
+    "LogQueryEngine",
+    "ReportGenerator",
+    "ExportManager",
+    "AnalyticsEngine",
     "__version__",
 ]
 
