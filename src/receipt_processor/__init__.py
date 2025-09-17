@@ -47,6 +47,12 @@ from .storage import (
     JSONStorageManager, LogRotationManager
 )
 
+# Import status tracking module
+from .status_tracker import (
+    EnhancedStatusTracker, StatusFlowValidator, RetryManager, 
+    ErrorCategorizer, ProcessingMetrics, ErrorCategory, RetryStrategy
+)
+
 # Note: Additional imports will be added as modules are implemented
 # from .cli import cli  # CLI is imported separately to avoid circular imports
 
@@ -94,6 +100,13 @@ __all__ = [
     "validate_receipt_data",
     "JSONStorageManager",
     "LogRotationManager",
+    "EnhancedStatusTracker",
+    "StatusFlowValidator",
+    "RetryManager",
+    "ErrorCategorizer",
+    "ProcessingMetrics",
+    "ErrorCategory",
+    "RetryStrategy",
     "__version__",
 ]
 
