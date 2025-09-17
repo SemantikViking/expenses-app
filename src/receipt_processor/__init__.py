@@ -42,6 +42,11 @@ from .data_parser import (
     clean_vendor_name, parse_date, extract_amount, validate_receipt_data
 )
 
+# Import storage module
+from .storage import (
+    JSONStorageManager, LogRotationManager
+)
+
 # Note: Additional imports will be added as modules are implemented
 # from .cli import cli  # CLI is imported separately to avoid circular imports
 
@@ -87,6 +92,8 @@ __all__ = [
     "parse_date",
     "extract_amount",
     "validate_receipt_data",
+    "JSONStorageManager",
+    "LogRotationManager",
     "__version__",
 ]
 
