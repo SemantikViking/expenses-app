@@ -77,6 +77,12 @@ from .email_system import (
     SMTPClient, EmailSender
 )
 
+# Import email workflow module
+from .email_workflow import (
+    EmailTriggerType, NotificationFrequency, EmailTriggerRule, EmailWorkflowConfig,
+    EmailWorkflowEvent, EmailBatchManager, EmailWorkflowLogger, EmailWorkflowIntegrator
+)
+
 # Note: Additional imports will be added as modules are implemented
 # from .cli import cli  # CLI is imported separately to avoid circular imports
 
@@ -176,6 +182,14 @@ __all__ = [
     "EmailTracker",
     "SMTPClient",
     "EmailSender",
+    "EmailTriggerType",
+    "NotificationFrequency",
+    "EmailTriggerRule",
+    "EmailWorkflowConfig",
+    "EmailWorkflowEvent",
+    "EmailBatchManager",
+    "EmailWorkflowLogger",
+    "EmailWorkflowIntegrator",
     "__version__",
 ]
 
