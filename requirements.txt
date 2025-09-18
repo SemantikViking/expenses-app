@@ -21,6 +21,7 @@ python-dateutil>=2.8.0
 # Email functionality
 aiosmtplib>=2.0.0
 email-validator>=2.1.0
+Jinja2>=3.1.0
 
 # CLI framework
 click>=8.1.0

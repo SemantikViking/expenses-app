@@ -68,6 +68,15 @@ from .file_manager import (
     FileBackupManager, FileOrganizer, FileManager
 )
 
+# Import email system module
+from .email_system import (
+    EmailAuthMethod, EmailProvider, EmailStatus, EmailPriority,
+    OAuth2Config, SMTPConfig, EmailConfig, EmailRecipient, EmailAttachment,
+    EmailTemplate, EmailMessage, EmailDeliveryResult, EmailProviderConfig,
+    OAuth2Manager, EmailTemplateManager, EmailValidator, EmailTracker,
+    SMTPClient, EmailSender
+)
+
 # Note: Additional imports will be added as modules are implemented
 # from .cli import cli  # CLI is imported separately to avoid circular imports
 
@@ -148,6 +157,25 @@ __all__ = [
     "FileBackupManager",
     "FileOrganizer",
     "FileManager",
+    "EmailAuthMethod",
+    "EmailProvider",
+    "EmailStatus",
+    "EmailPriority",
+    "OAuth2Config",
+    "SMTPConfig",
+    "EmailConfig",
+    "EmailRecipient",
+    "EmailAttachment",
+    "EmailTemplate",
+    "EmailMessage",
+    "EmailDeliveryResult",
+    "EmailProviderConfig",
+    "OAuth2Manager",
+    "EmailTemplateManager",
+    "EmailValidator",
+    "EmailTracker",
+    "SMTPClient",
+    "EmailSender",
     "__version__",
 ]
 

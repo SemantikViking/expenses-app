@@ -1,0 +1,20 @@
+{
+  "null": {
+    "status": "sent",
+    "sent_at": "2025-09-18T21:34:16.157655",
+    "delivered_at": null,
+    "error_message": null,
+    "retry_count": 0,
+    "bounce_reason": null,
+    "tracking_data": {}
+  },
+  "null": {
+    "status": "sent",
+    "sent_at": "2025-09-18T21:34:16.173558",
+    "delivered_at": null,
+    "error_message": null,
+    "retry_count": 0,
+    "bounce_reason": null,
+    "tracking_data": {}
+  }
+}
