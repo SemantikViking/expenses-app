@@ -83,6 +83,23 @@ from .email_workflow import (
     EmailWorkflowEvent, EmailBatchManager, EmailWorkflowLogger, EmailWorkflowIntegrator
 )
 
+# Import payment tracking module
+from .payment_models import (
+    PaymentStatus, PaymentMethod, PaymentType, ApprovalStatus, PaymentPriority,
+    ReconciliationStatus, PaymentRecipient, PaymentApproval, PaymentDisbursement,
+    PaymentReconciliation, PaymentAuditTrail, PaymentTrackingLog, PaymentBatch, PaymentReport
+)
+from .payment_storage import PaymentStorageManager, PaymentBatchManager
+from .payment_validation import (
+    ValidationSeverity, ValidationRule, ValidationResult, PaymentValidator, PaymentReconciler
+)
+from .payment_workflow import (
+    WorkflowAction, WorkflowEvent, WorkflowRule, WorkflowStep, PaymentWorkflowEngine
+)
+from .payment_reporting import (
+    ReportType, ReportFormat, ReportFilter, ReportMetrics, PaymentReporter
+)
+
 # Note: Additional imports will be added as modules are implemented
 # from .cli import cli  # CLI is imported separately to avoid circular imports
 
@@ -190,6 +207,37 @@ __all__ = [
     "EmailBatchManager",
     "EmailWorkflowLogger",
     "EmailWorkflowIntegrator",
+    "PaymentStatus",
+    "PaymentMethod",
+    "PaymentType",
+    "ApprovalStatus",
+    "PaymentPriority",
+    "ReconciliationStatus",
+    "PaymentRecipient",
+    "PaymentApproval",
+    "PaymentDisbursement",
+    "PaymentReconciliation",
+    "PaymentAuditTrail",
+    "PaymentTrackingLog",
+    "PaymentBatch",
+    "PaymentReport",
+    "PaymentStorageManager",
+    "PaymentBatchManager",
+    "ValidationSeverity",
+    "ValidationRule",
+    "ValidationResult",
+    "PaymentValidator",
+    "PaymentReconciler",
+    "WorkflowAction",
+    "WorkflowEvent",
+    "WorkflowRule",
+    "WorkflowStep",
+    "PaymentWorkflowEngine",
+    "ReportType",
+    "ReportFormat",
+    "ReportFilter",
+    "ReportMetrics",
+    "PaymentReporter",
     "__version__",
 ]
 
