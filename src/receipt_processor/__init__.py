@@ -60,6 +60,14 @@ from .reporting import (
     LogQueryEngine, ReportGenerator, ExportManager, AnalyticsEngine
 )
 
+# Import file management module
+from .file_manager import (
+    FileOrganizationMode, FileValidationResult, FileValidationReport,
+    FileRenameResult, FileOrganizationConfig, FileNameSanitizer,
+    FileNamingGenerator, FileValidator, DuplicateHandler,
+    FileBackupManager, FileOrganizer, FileManager
+)
+
 # Note: Additional imports will be added as modules are implemented
 # from .cli import cli  # CLI is imported separately to avoid circular imports
 
@@ -128,6 +136,18 @@ __all__ = [
     "ReportGenerator",
     "ExportManager",
     "AnalyticsEngine",
+    "FileOrganizationMode",
+    "FileValidationResult",
+    "FileValidationReport",
+    "FileRenameResult",
+    "FileOrganizationConfig",
+    "FileNameSanitizer",
+    "FileNamingGenerator",
+    "FileValidator",
+    "DuplicateHandler",
+    "FileBackupManager",
+    "FileOrganizer",
+    "FileManager",
     "__version__",
 ]
 

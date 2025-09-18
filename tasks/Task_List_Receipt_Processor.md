@@ -105,19 +105,19 @@ sful
 
 ## Phase 4: File Management & Naming
 
-### T011: File Renaming System [ ]
-- [ ] Implement standardized naming format (YYYY-MM-DD_Vendor_Amount.ext)
-- [ ] Add file name sanitization and validation
-- [ ] Create duplicate handling logic
-- [ ] Implement rollback mechanism for failed renames
-- [ ] Add original filename preservation in logs
+### T011: File Renaming System [x]
+- [x] Implement standardized naming format (YYYY-MM-DD_Vendor_Amount.ext)
+- [x] Add file name sanitization and validation
+- [x] Create duplicate handling logic
+- [x] Implement rollback mechanism for failed renames
+- [x] Add original filename preservation in logs
 
-### T012: File Organization [ ]
-- [ ] Create organized folder structure options
-- [ ] Add file backup before processing
-- [ ] Implement file permission handling
-- [ ] Add file size and format validation
-- [ ] Create file cleanup utilities
+### T012: File Organization [x]
+- [x] Create organized folder structure options
+- [x] Add file backup before processing
+- [x] Implement file permission handling
+- [x] Add file size and format validation
+- [x] Create file cleanup utilities
 
 ---
 
