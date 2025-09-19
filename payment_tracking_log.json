@@ -1,0 +1,13 @@
+{
+  "payments": {},
+  "batches": {},
+  "reports": {},
+  "metadata": {
+    "created_at": "2025-09-19T18:43:04.995106",
+    "version": "1.0",
+    "last_updated": "2025-09-19T18:43:04.995113",
+    "total_payments": 0,
+    "total_batches": 0,
+    "total_reports": 0
+  }
+}

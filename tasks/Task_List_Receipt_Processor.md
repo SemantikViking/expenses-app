@@ -176,33 +176,40 @@ sful
 
 ---
 
-## Phase 5: Command-Line Interface
+## Phase 5: Command-Line Interface [✅]
 
-### T013: CLI Framework [ ]
-- [ ] Set up Click or argparse for CLI commands
-- [ ] Create main application entry point
-- [ ] Add help system and command documentation
-- [ ] Implement configuration file path handling
-- [ ] Add verbose/quiet output modes
+### T013: CLI Framework [✅]
+- [x] Set up Click or argparse for CLI commands
+- [x] Create main application entry point
+- [x] Add help system and command documentation
+- [x] Implement configuration file path handling
+- [x] Add verbose/quiet output modes
 
-### T014: Core CLI Commands [ ]
-- [ ] Implement `start` command for background monitoring
-- [ ] Add `process` command for batch processing
-- [ ] Create `status` command for application state
-- [ ] Add `logs` command with filtering options
-- [ ] Implement `config` commands (init, show, validate)
+### T014: Core CLI Commands [✅]
+- [x] Implement `start` command for background monitoring
+- [x] Add `process` command for batch processing
+- [x] Create `status` command for application state
+- [x] Add `logs` command with filtering options
+- [x] Implement `config` commands (init, show, validate)
 
-### T015: Enhanced CLI Features [ ]
-- [ ] Add `report` command for analytics with workflow status
-- [ ] Implement `export` command for data export with transitions
-- [ ] Create `stats` command for processing statistics with payment status
-- [ ] Add `update-status` command for manual status updates
-- [ ] Implement `email` command for sending receipts
-- [ ] Add `submit` command for payment submission tracking
-- [ ] Create `payment-received` command for payment confirmation
-- [ ] Add progress bars for long operations
-- [ ] Implement interactive mode for confirmations
-- [ ] Add bulk operations for multiple receipts
+### T015: Enhanced CLI Features [✅]
+- [x] Add `report` command for analytics with workflow status
+- [x] Implement `export` command for data export with transitions
+- [x] Create `stats` command for processing statistics with payment status
+- [x] Add `update-status` command for manual status updates
+- [x] Implement `email` command for sending receipts
+- [x] Add `submit` command for payment submission tracking
+- [x] Create `payment-received` command for payment confirmation
+- [x] Add progress bars for long operations
+- [x] Implement interactive mode for confirmations
+- [x] Add bulk operations for multiple receipts
+
+### T016: CLI Testing & Quality Assurance [✅]
+- [x] Create comprehensive CLI test suite (19 test cases)
+- [x] Add unit tests for all CLI commands and functionality
+- [x] Implement error handling and edge case testing
+- [x] Add CLI integration tests with storage systems
+- [x] Create CLI documentation and usage examples
 
 ---
 
@@ -324,29 +331,33 @@ sful
 
 ### Source Code
 - `src/receipt_processor/` - Main application package
-- `src/receipt_processor/config.py` - Configuration models (including EmailSettings, PaymentSettings)
-- `src/receipt_processor/monitor.py` - File system monitoring
-- `src/receipt_processor/vision.py` - AI vision integration
-- `src/receipt_processor/logger.py` - JSON logging system with status tracking
-- `src/receipt_processor/status.py` - Status management and transitions
-- `src/receipt_processor/email.py` - Email integration and delivery
+- `src/receipt_processor/models.py` - Core data models and Pydantic schemas
+- `src/receipt_processor/storage.py` - JSON-based storage system with atomic operations
+- `src/receipt_processor/status_tracker.py` - Enhanced status tracking and workflow management
+- `src/receipt_processor/reporting.py` - Advanced reporting and analytics system
+- `src/receipt_processor/file_manager.py` - File management and naming system
+- `src/receipt_processor/email_system.py` - Email integration and delivery system
+- `src/receipt_processor/email_workflow.py` - Email workflow integration and automation
+- `src/receipt_processor/email_cli.py` - Email CLI commands and management
 - `src/receipt_processor/payment_models.py` - Payment tracking data models and status management
 - `src/receipt_processor/payment_storage.py` - Payment storage and persistence system
 - `src/receipt_processor/payment_validation.py` - Payment validation and reconciliation logic
 - `src/receipt_processor/payment_workflow.py` - Payment workflow and status transitions
 - `src/receipt_processor/payment_reporting.py` - Payment reporting and analytics system
-- `src/receipt_processor/cli.py` - Command-line interface with enhanced commands
-- `src/receipt_processor/reports.py` - Advanced reporting and analytics
+- `src/receipt_processor/cli.py` - Comprehensive command-line interface
+- `receipt_processor.py` - Main executable entry point
 
 ### Tests
 - `tests/` - Test suite directory
-- `tests/test_config.py` - Configuration tests
-- `tests/test_vision.py` - AI vision tests
-- `tests/test_logger.py` - Logging system tests
-- `tests/test_status.py` - Status tracking and transition tests
-- `tests/test_email.py` - Email integration tests
+- `tests/test_models.py` - Core data model tests
+- `tests/test_storage.py` - JSON storage system tests
+- `tests/test_status_tracker.py` - Status tracking and workflow tests
+- `tests/test_reporting.py` - Reporting and analytics tests
+- `tests/test_file_manager.py` - File management and naming tests
+- `tests/test_email_system.py` - Email system integration tests
+- `tests/test_email_workflow.py` - Email workflow automation tests
 - `tests/test_payment_tracking.py` - Comprehensive payment tracking tests (39 test cases)
-- `tests/test_workflow.py` - End-to-end workflow tests
+- `tests/test_cli.py` - CLI command and functionality tests (19 test cases)
 
 ### Documentation
 - `README.md` - Project overview and setup
@@ -358,11 +369,11 @@ sful
 ## Development Notes
 
 ### Current Status
-- **Phase:** Phase 4B Complete - Payment Tracking System Implemented
-- **Next Task:** T013 - CLI Framework (Phase 5)
+- **Phase:** Phase 5 Complete - Command-Line Interface Implemented
+- **Next Task:** T016 - Background Service (Phase 6)
 - **Priority:** High
-- **Completed Phases:** 1, 2, 3, 4, 4A, 4B
-- **Estimated Timeline:** 4-6 weeks remaining for CLI, background processing, testing, and deployment
+- **Completed Phases:** 1, 2, 3, 4, 4A, 4B, 5
+- **Estimated Timeline:** 3-4 weeks remaining for background processing, testing, and deployment
 
 ### Key Dependencies
 - Pydantic AI for structured data extraction
