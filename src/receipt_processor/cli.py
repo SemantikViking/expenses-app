@@ -33,6 +33,8 @@ from src.receipt_processor.email_workflow import EmailWorkflowIntegrator, EmailW
 from src.receipt_processor.payment_workflow import PaymentWorkflowEngine
 from src.receipt_processor.payment_storage import PaymentStorageManager
 from src.receipt_processor.payment_models import PaymentStatus, PaymentType, PaymentMethod, PaymentRecipient
+from src.receipt_processor.daemon import ServiceManager, ServiceConfig, ServiceStatus
+from src.receipt_processor.concurrent_processor import ConcurrentProcessor, ProcessingJob, ProcessingPriority, ResourceLimits
 
 # Configure logging
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
@@ -989,6 +991,244 @@ def bulk_submit(status, vendor, date_from, date_to, amount_min, amount_max, amou
                 pbar.update(1)
     
     echo_success(f"Bulk submit completed - {submitted_count} submitted, {error_count} errors")
+
+@cli.command()
+@click.option('--pid-file', '-p', type=click.Path(), default='receipt_processor.pid', help='PID file path')
+@click.option('--watch-dir', '-w', type=click.Path(exists=True), required=True, help='Directory to monitor for new receipts')
+@click.option('--processed-dir', '-o', type=click.Path(), help='Directory to move processed receipts')
+@click.option('--max-workers', '-n', type=int, default=4, help='Maximum number of worker threads')
+@click.option('--check-interval', '-i', type=int, default=5, help='File check interval in seconds')
+@click.option('--memory-limit', '-m', type=int, default=512, help='Memory limit in MB')
+@click.option('--cpu-limit', '-c', type=float, default=80.0, help='CPU limit percentage')
+def daemon_start(pid_file, watch_dir, processed_dir, max_workers, check_interval, memory_limit, cpu_limit):
+    """Start the receipt processor daemon service."""
+    echo_info("Starting receipt processor daemon...")
+    
+    try:
+        # Create service configuration
+        config = ServiceConfig(
+            pid_file=Path(pid_file),
+            log_file=cli_state.log_file,
+            watch_directory=Path(watch_dir),
+            processed_directory=Path(processed_dir) if processed_dir else None,
+            check_interval=check_interval,
+            max_workers=max_workers,
+            memory_limit_mb=memory_limit,
+            cpu_limit_percent=cpu_limit
+        )
+        
+        # Create service manager
+        service_manager = ServiceManager(
+            config=config,
+            storage_manager=cli_state.storage_manager,
+            status_tracker=cli_state.status_tracker
+        )
+        
+        # Start service
+        if service_manager.start_service():
+            echo_success("Daemon service started successfully")
+            echo_info(f"PID file: {pid_file}")
+            echo_info(f"Watching: {watch_dir}")
+            if processed_dir:
+                echo_info(f"Processed files will be moved to: {processed_dir}")
+        else:
+            echo_error("Failed to start daemon service")
+            click.exit(1)
+            
+    except Exception as e:
+        echo_error(f"Error starting daemon service: {e}")
+        click.exit(1)
+
+@cli.command()
+@click.option('--pid-file', '-p', type=click.Path(), default='receipt_processor.pid', help='PID file path')
+def daemon_stop(pid_file):
+    """Stop the receipt processor daemon service."""
+    echo_info("Stopping receipt processor daemon...")
+    
+    try:
+        # Check if PID file exists
+        pid_path = Path(pid_file)
+        if not pid_path.exists():
+            echo_warning("PID file not found - service may not be running")
+            return
+        
+        # Read PID
+        with open(pid_path, 'r') as f:
+            pid = int(f.read().strip())
+        
+        # Send SIGTERM to process
+        import signal
+        try:
+            os.kill(pid, signal.SIGTERM)
+            echo_success("Stop signal sent to daemon process")
+        except ProcessLookupError:
+            echo_warning("Process not found - may have already stopped")
+        except PermissionError:
+            echo_error("Permission denied - try running with sudo")
+            click.exit(1)
+        
+        # Wait for process to stop
+        import time
+        for i in range(30):  # Wait up to 30 seconds
+            try:
+                os.kill(pid, 0)  # Check if process exists
+                time.sleep(1)
+            except ProcessLookupError:
+                echo_success("Daemon service stopped")
+                return
+        
+        echo_warning("Daemon did not stop gracefully - may need force kill")
+        
+    except Exception as e:
+        echo_error(f"Error stopping daemon service: {e}")
+        click.exit(1)
+
+@cli.command()
+@click.option('--pid-file', '-p', type=click.Path(), default='receipt_processor.pid', help='PID file path')
+def daemon_restart(pid_file):
+    """Restart the receipt processor daemon service."""
+    echo_info("Restarting receipt processor daemon...")
+    
+    # Stop first
+    daemon_stop(pid_file)
+    
+    # Wait a moment
+    import time
+    time.sleep(2)
+    
+    # Start again
+    echo_info("Starting daemon service...")
+    # Note: This is a simplified restart - in practice you'd want to preserve the original config
+    echo_warning("Restart command requires original configuration parameters")
+    echo_info("Please use 'daemon-start' with the same parameters as before")
+
+@cli.command()
+@click.option('--pid-file', '-p', type=click.Path(), default='receipt_processor.pid', help='PID file path')
+def daemon_status(pid_file):
+    """Show daemon service status."""
+    try:
+        pid_path = Path(pid_file)
+        if not pid_path.exists():
+            echo_info("Daemon service is not running (no PID file)")
+            return
+        
+        # Read PID
+        with open(pid_path, 'r') as f:
+            pid = int(f.read().strip())
+        
+        # Check if process is running
+        try:
+            import psutil
+            process = psutil.Process(pid)
+            
+            echo_success("Daemon service is running")
+            click.echo(f"PID: {pid}")
+            click.echo(f"Status: {process.status()}")
+            click.echo(f"Memory usage: {process.memory_info().rss / 1024 / 1024:.1f} MB")
+            click.echo(f"CPU usage: {process.cpu_percent():.1f}%")
+            click.echo(f"Started: {datetime.fromtimestamp(process.create_time())}")
+            
+        except psutil.NoSuchProcess:
+            echo_warning("Daemon service is not running (process not found)")
+            # Clean up stale PID file
+            pid_path.unlink()
+        except psutil.AccessDenied:
+            echo_error("Permission denied - cannot access process information")
+            
+    except Exception as e:
+        echo_error(f"Error checking daemon status: {e}")
+
+@cli.command()
+@click.option('--max-workers', '-n', type=int, default=4, help='Maximum number of worker threads')
+@click.option('--memory-limit', '-m', type=int, default=512, help='Memory limit in MB')
+@click.option('--cpu-limit', '-c', type=float, default=80.0, help='CPU limit percentage')
+@click.option('--input-dir', '-i', type=click.Path(exists=True), required=True, help='Directory containing images to process')
+@click.option('--priority', '-p', type=click.Choice(['low', 'normal', 'high', 'urgent']), default='normal', help='Processing priority')
+def process_concurrent(max_workers, memory_limit, cpu_limit, input_dir, priority):
+    """Process images using concurrent processing with resource monitoring."""
+    echo_info("Starting concurrent processing...")
+    
+    try:
+        # Create resource limits
+        resource_limits = ResourceLimits(
+            max_memory_mb=memory_limit,
+            max_cpu_percent=cpu_limit,
+            max_concurrent_jobs=max_workers
+        )
+        
+        # Create concurrent processor
+        processor = ConcurrentProcessor(
+            max_workers=max_workers,
+            resource_limits=resource_limits
+        )
+        
+        # Start processor
+        processor.start()
+        
+        # Find image files
+        input_path = Path(input_dir)
+        image_extensions = {'.jpg', '.jpeg', '.png', '.bmp', '.tiff', '.webp'}
+        image_files = []
+        
+        for ext in image_extensions:
+            image_files.extend(input_path.glob(f'*{ext}'))
+            image_files.extend(input_path.glob(f'*{ext.upper()}'))
+        
+        if not image_files:
+            echo_info("No image files found to process")
+            processor.stop()
+            return
+        
+        echo_info(f"Found {len(image_files)} image files to process")
+        
+        # Submit jobs
+        priority_enum = ProcessingPriority[priority.upper()]
+        submitted_count = 0
+        
+        with show_progress_bar(image_files, desc="Submitting jobs", total=len(image_files)) as pbar:
+            for file_path in image_files:
+                job = ProcessingJob(
+                    job_id=f"job_{submitted_count}",
+                    file_path=file_path,
+                    priority=priority_enum
+                )
+                
+                if processor.submit_job(job):
+                    submitted_count += 1
+                
+                pbar.set_postfix({
+                    'Submitted': submitted_count,
+                    'Queue': processor.priority_queue.size()
+                })
+                pbar.update(1)
+        
+        echo_success(f"Submitted {submitted_count} jobs for processing")
+        
+        # Monitor processing
+        echo_info("Monitoring processing...")
+        while processor.priority_queue.size() > 0 or len(processor.active_jobs) > 0:
+            metrics = processor.get_metrics()
+            queue_status = processor.get_queue_status()
+            
+            echo_verbose(f"Queue: {queue_status['total_size']}, Active: {queue_status['active_jobs']}, "
+                        f"Completed: {metrics.completed_jobs}, Failed: {metrics.failed_jobs}")
+            
+            time.sleep(2)
+        
+        # Final metrics
+        final_metrics = processor.get_metrics()
+        echo_success("Concurrent processing completed")
+        echo_info(f"Total jobs: {final_metrics.total_jobs}")
+        echo_info(f"Completed: {final_metrics.completed_jobs}")
+        echo_info(f"Failed: {final_metrics.failed_jobs}")
+        echo_info(f"Average processing time: {final_metrics.average_processing_time:.2f}s")
+        
+        # Stop processor
+        processor.stop()
+        
+    except Exception as e:
+        echo_error(f"Error in concurrent processing: {e}")
+        click.exit(1)
 
 if __name__ == '__main__':
     cli()

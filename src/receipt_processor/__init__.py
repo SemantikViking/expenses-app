@@ -100,6 +100,17 @@ from .payment_reporting import (
     ReportType, ReportFormat, ReportFilter, ReportMetrics, PaymentReporter
 )
 
+# Import daemon module
+from .daemon import (
+    ServiceStatus, ServiceConfig, ServiceMetrics, DaemonService, ServiceManager
+)
+
+# Import concurrent processing module
+from .concurrent_processor import (
+    ProcessingPriority, JobStatus, ProcessingJob, ResourceLimits, ProcessingMetrics,
+    PriorityQueue, ResourceMonitor, ConcurrentProcessor
+)
+
 # Note: Additional imports will be added as modules are implemented
 # from .cli import cli  # CLI is imported separately to avoid circular imports
 
@@ -238,6 +249,19 @@ __all__ = [
     "ReportFilter",
     "ReportMetrics",
     "PaymentReporter",
+    "ServiceStatus",
+    "ServiceConfig",
+    "ServiceMetrics",
+    "DaemonService",
+    "ServiceManager",
+    "ProcessingPriority",
+    "JobStatus",
+    "ProcessingJob",
+    "ResourceLimits",
+    "ProcessingMetrics",
+    "PriorityQueue",
+    "ResourceMonitor",
+    "ConcurrentProcessor",
     "__version__",
 ]
 
