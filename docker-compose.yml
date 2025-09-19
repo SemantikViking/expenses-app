@@ -1,0 +1,80 @@
+version: '3.8'
+
+services:
+  receipt-processor:
+    build:
+      context: .
+      target: production
+    image: receipt-processor:latest
+    container_name: receipt-processor
+    restart: unless-stopped
+    environment:
+      - PYTHONUNBUFFERED=1
+      - RECEIPT_PROCESSOR_ENV=production
+    volumes:
+      - ./data:/app/data
+      - ./logs:/app/logs
+      - ./config:/app/config
+      - ./screenshots:/app/screenshots
+    ports:
+      - "8000:8000"
+    healthcheck:
+      test: ["CMD", "receipt-processor", "health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+    networks:
+      - receipt-processor-network
+
+  # Optional: Redis for caching
+  redis:
+    image: redis:7-alpine
+    container_name: receipt-processor-redis
+    restart: unless-stopped
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    networks:
+      - receipt-processor-network
+
+  # Optional: PostgreSQL for advanced storage
+  postgres:
+    image: postgres:15-alpine
+    container_name: receipt-processor-postgres
+    restart: unless-stopped
+    environment:
+      - POSTGRES_DB=receipt_processor
+      - POSTGRES_USER=receipt_processor
+      - POSTGRES_PASSWORD=receipt_processor_password
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+    networks:
+      - receipt-processor-network
+
+  # Optional: Nginx reverse proxy
+  nginx:
+    image: nginx:alpine
+    container_name: receipt-processor-nginx
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./ssl:/etc/nginx/ssl:ro
+    depends_on:
+      - receipt-processor
+    networks:
+      - receipt-processor-network
+
+volumes:
+  redis_data:
+  postgres_data:
+
+networks:
+  receipt-processor-network:
+    driver: bridge

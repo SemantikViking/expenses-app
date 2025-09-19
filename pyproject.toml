@@ -1,10 +1,10 @@
 [build-system]
-requires = ["setuptools>=61.0", "wheel"]
+requires = ["setuptools>=61.0", "wheel", "setuptools-scm>=6.2"]
 build-backend = "setuptools.build_meta"
 
 [project]
 name = "receipt-processor"
-version = "1.0.0"
+dynamic = ["version"]
 description = "AI-powered receipt processing and payment tracking system"
 readme = "README.md"
 requires-python = ">=3.8"
@@ -12,11 +12,17 @@ license = {text = "MIT"}
 authors = [
     {name = "Receipt Processor Team", email = "team@receiptprocessor.com"}
 ]
-keywords = ["receipt", "processing", "ai", "vision", "payment", "tracking"]
+maintainers = [
+    {name = "Receipt Processor Team", email = "team@receiptprocessor.com"}
+]
+keywords = ["receipt", "processing", "ai", "vision", "payment", "tracking", "ocr", "expense", "automation"]
 classifiers = [
     "Development Status :: 5 - Production/Stable",
     "Intended Audience :: Developers",
+    "Intended Audience :: End Users/Desktop",
+    "Intended Audience :: Financial and Insurance Industry",
     "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
     "Programming Language :: Python :: 3",
     "Programming Language :: Python :: 3.8",
     "Programming Language :: Python :: 3.9",
@@ -26,6 +32,13 @@ classifiers = [
     "Topic :: Software Development :: Libraries :: Python Modules",
     "Topic :: Office/Business :: Financial",
     "Topic :: Scientific/Engineering :: Artificial Intelligence",
+    "Topic :: Multimedia :: Graphics :: Capture :: Digital Camera",
+    "Topic :: Text Processing :: Markup :: HTML",
+    "Topic :: Communications :: Email",
+    "Topic :: System :: Monitoring",
+    "Topic :: System :: Archiving",
+    "Environment :: Console",
+    "Environment :: Web Environment",
 ]
 
 dependencies = [
@@ -98,7 +111,12 @@ rp = "src.receipt_processor.cli:cli"
 where = ["src"]
 
 [tool.setuptools.package-data]
-"receipt_processor" = ["templates/*.html", "templates/*.txt"]
+"receipt_processor" = ["templates/*.html", "templates/*.txt", "*.json", "*.yaml", "*.yml"]
+
+# Version management
+[tool.setuptools_scm]
+write_to = "src/receipt_processor/_version.py"
+write_to_template = '"""Version information for receipt-processor package."""\n__version__ = "{version}"\n'
 
 # Black configuration
 [tool.black]
