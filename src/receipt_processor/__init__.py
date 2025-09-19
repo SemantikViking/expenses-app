@@ -111,6 +111,23 @@ from .concurrent_processor import (
     PriorityQueue, ResourceMonitor, ConcurrentProcessor
 )
 
+# Import error handling module
+from .error_handling import (
+    ErrorSeverity, ErrorCategory, RetryStrategy, ErrorContext, ErrorInfo,
+    ReceiptProcessorError, ValidationError, ProcessingError, StorageError,
+    NetworkError, AIServiceError, FileSystemError, ConfigurationError,
+    PermissionError, ResourceError, TimeoutError, ErrorCategorizer,
+    RetryManager, ErrorRecoveryManager, ErrorReporter, ErrorHandler,
+    handle_errors
+)
+
+# Import system monitoring module
+from .system_monitoring import (
+    HealthStatus, AlertLevel, ResourceMetrics, PerformanceMetrics,
+    HealthCheck, Alert, ResourceMonitor, PerformanceMonitor,
+    HealthChecker, AlertManager, SystemMonitor
+)
+
 # Note: Additional imports will be added as modules are implemented
 # from .cli import cli  # CLI is imported separately to avoid circular imports
 
@@ -262,6 +279,39 @@ __all__ = [
     "PriorityQueue",
     "ResourceMonitor",
     "ConcurrentProcessor",
+    "ErrorSeverity",
+    "ErrorCategory",
+    "RetryStrategy",
+    "ErrorContext",
+    "ErrorInfo",
+    "ReceiptProcessorError",
+    "ValidationError",
+    "ProcessingError",
+    "StorageError",
+    "NetworkError",
+    "AIServiceError",
+    "FileSystemError",
+    "ConfigurationError",
+    "PermissionError",
+    "ResourceError",
+    "TimeoutError",
+    "ErrorCategorizer",
+    "RetryManager",
+    "ErrorRecoveryManager",
+    "ErrorReporter",
+    "ErrorHandler",
+    "handle_errors",
+    "HealthStatus",
+    "AlertLevel",
+    "ResourceMetrics",
+    "PerformanceMetrics",
+    "HealthCheck",
+    "Alert",
+    "ResourceMonitor",
+    "PerformanceMonitor",
+    "HealthChecker",
+    "AlertManager",
+    "SystemMonitor",
     "__version__",
 ]
 

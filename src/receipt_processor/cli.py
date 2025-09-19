@@ -35,6 +35,8 @@ from src.receipt_processor.payment_storage import PaymentStorageManager
 from src.receipt_processor.payment_models import PaymentStatus, PaymentType, PaymentMethod, PaymentRecipient
 from src.receipt_processor.daemon import ServiceManager, ServiceConfig, ServiceStatus
 from src.receipt_processor.concurrent_processor import ConcurrentProcessor, ProcessingJob, ProcessingPriority, ResourceLimits
+from src.receipt_processor.error_handling import ErrorHandler, ErrorContext, ReceiptProcessorError, ErrorSeverity, ErrorCategory
+from src.receipt_processor.system_monitoring import SystemMonitor, HealthStatus, AlertLevel
 
 # Configure logging
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
@@ -1228,6 +1230,329 @@ def process_concurrent(max_workers, memory_limit, cpu_limit, input_dir, priority
         
     except Exception as e:
         echo_error(f"Error in concurrent processing: {e}")
+        click.exit(1)
+
+@cli.command()
+def health():
+    """Show system health status and metrics."""
+    echo_info("Checking system health...")
+    
+    try:
+        # Create system monitor
+        monitor = SystemMonitor()
+        
+        # Get system status
+        status = monitor.get_system_status()
+        
+        # Display overall health
+        overall_health = status['overall_health']
+        health_icon = {
+            'healthy': '✅',
+            'warning': '⚠️',
+            'critical': '❌',
+            'unknown': '❓'
+        }.get(overall_health, '❓')
+        
+        click.echo(f"\n{health_icon} Overall Health: {overall_health.upper()}")
+        click.echo(f"Timestamp: {status['timestamp']}")
+        
+        # Display health checks
+        click.echo(f"\n📊 Health Checks:")
+        click.echo("-" * 60)
+        for check in status['health_checks']:
+            status_icon = {
+                'healthy': '✅',
+                'warning': '⚠️',
+                'critical': '❌',
+                'unknown': '❓'
+            }.get(check['status'], '❓')
+            
+            click.echo(f"{status_icon} {check['name']}: {check['message']}")
+            if check['response_time_ms'] > 0:
+                click.echo(f"    Response time: {check['response_time_ms']:.1f}ms")
+        
+        # Display resource metrics
+        click.echo(f"\n💻 Resource Metrics:")
+        click.echo("-" * 40)
+        metrics = status['resource_metrics']
+        click.echo(f"CPU Usage: {metrics['cpu_percent']:.1f}%")
+        click.echo(f"Memory Usage: {metrics['memory_percent']:.1f}% ({metrics['memory_used_mb']:.1f} MB)")
+        click.echo(f"Disk Usage: {metrics['disk_usage_percent']:.1f}% ({metrics['disk_free_gb']:.1f} GB free)")
+        
+        # Display performance metrics
+        click.echo(f"\n⚡ Performance Metrics:")
+        click.echo("-" * 40)
+        perf = status['performance_metrics']
+        click.echo(f"Requests/sec: {perf['requests_per_second']:.2f}")
+        click.echo(f"Avg Response Time: {perf['average_response_time']:.3f}s")
+        click.echo(f"Error Rate: {perf['error_rate']:.1f}%")
+        
+        # Display alerts
+        if status['active_alerts'] > 0:
+            click.echo(f"\n🚨 Active Alerts ({status['active_alerts']}):")
+            click.echo("-" * 40)
+            for alert in status['alerts']:
+                level_icon = {
+                    'info': 'ℹ️',
+                    'warning': '⚠️',
+                    'error': '❌',
+                    'critical': '🚨'
+                }.get(alert['level'], '❓')
+                
+                click.echo(f"{level_icon} {alert['title']}: {alert['message']}")
+        else:
+            click.echo(f"\n✅ No active alerts")
+        
+    except Exception as e:
+        echo_error(f"Error checking system health: {e}")
+        click.exit(1)
+
+@cli.command()
+@click.option('--duration', '-d', type=int, default=60, help='Duration in minutes to show metrics for')
+@click.option('--format', 'output_format', type=click.Choice(['table', 'json']), default='table', help='Output format')
+def metrics(duration, output_format):
+    """Show detailed system metrics and performance data."""
+    echo_info(f"Collecting metrics for last {duration} minutes...")
+    
+    try:
+        # Create system monitor
+        monitor = SystemMonitor()
+        
+        # Get metrics history
+        resource_metrics = monitor.resource_monitor.get_metrics_history(duration)
+        performance_metrics = monitor.performance_monitor.get_metrics_history(duration)
+        
+        if output_format == 'json':
+            # JSON output
+            data = {
+                'duration_minutes': duration,
+                'resource_metrics': [
+                    {
+                        'timestamp': m.timestamp.isoformat(),
+                        'cpu_percent': m.cpu_percent,
+                        'memory_percent': m.memory_percent,
+                        'memory_used_mb': m.memory_used_mb,
+                        'disk_usage_percent': m.disk_usage_percent,
+                        'disk_free_gb': m.disk_free_gb
+                    }
+                    for m in resource_metrics
+                ],
+                'performance_metrics': [
+                    {
+                        'timestamp': m.timestamp.isoformat(),
+                        'requests_per_second': m.requests_per_second,
+                        'average_response_time': m.average_response_time,
+                        'error_rate': m.error_rate
+                    }
+                    for m in performance_metrics
+                ]
+            }
+            click.echo(json.dumps(data, indent=2))
+        else:
+            # Table output
+            click.echo(f"\n📈 Resource Metrics (Last {duration} minutes):")
+            click.echo("-" * 80)
+            click.echo(f"{'Time':<20} {'CPU%':<8} {'Mem%':<8} {'Mem(MB)':<10} {'Disk%':<8} {'Free(GB)':<10}")
+            click.echo("-" * 80)
+            
+            for metric in resource_metrics[-10:]:  # Show last 10 entries
+                time_str = metric.timestamp.strftime('%H:%M:%S')
+                click.echo(f"{time_str:<20} {metric.cpu_percent:<8.1f} {metric.memory_percent:<8.1f} "
+                          f"{metric.memory_used_mb:<10.1f} {metric.disk_usage_percent:<8.1f} {metric.disk_free_gb:<10.1f}")
+            
+            if performance_metrics:
+                click.echo(f"\n⚡ Performance Metrics (Last {duration} minutes):")
+                click.echo("-" * 60)
+                click.echo(f"{'Time':<20} {'Req/sec':<10} {'Avg Resp(s)':<12} {'Error%':<8}")
+                click.echo("-" * 60)
+                
+                for metric in performance_metrics[-10:]:  # Show last 10 entries
+                    time_str = metric.timestamp.strftime('%H:%M:%S')
+                    click.echo(f"{time_str:<20} {metric.requests_per_second:<10.2f} "
+                              f"{metric.average_response_time:<12.3f} {metric.error_rate:<8.1f}")
+        
+    except Exception as e:
+        echo_error(f"Error collecting metrics: {e}")
+        click.exit(1)
+
+@cli.command()
+@click.option('--level', '-l', type=click.Choice(['info', 'warning', 'error', 'critical', 'all']), 
+              default='all', help='Filter alerts by level')
+@click.option('--resolved', '-r', is_flag=True, help='Include resolved alerts')
+def alerts(level, resolved):
+    """Show system alerts and notifications."""
+    echo_info("Checking system alerts...")
+    
+    try:
+        # Create system monitor
+        monitor = SystemMonitor()
+        
+        # Get alerts
+        all_alerts = monitor.alert_manager.alerts
+        if not resolved:
+            all_alerts = [alert for alert in all_alerts if not alert.resolved]
+        
+        # Filter by level
+        if level != 'all':
+            all_alerts = [alert for alert in all_alerts if alert.level.value == level]
+        
+        if not all_alerts:
+            echo_info("No alerts found")
+            return
+        
+        # Display alerts
+        click.echo(f"\n🚨 System Alerts ({len(all_alerts)} found):")
+        click.echo("-" * 80)
+        
+        for alert in sorted(all_alerts, key=lambda x: x.timestamp, reverse=True):
+            level_icon = {
+                'info': 'ℹ️',
+                'warning': '⚠️',
+                'error': '❌',
+                'critical': '🚨'
+            }.get(alert.level.value, '❓')
+            
+            status_icon = '✅' if alert.resolved else '🔴'
+            time_str = alert.timestamp.strftime('%Y-%m-%d %H:%M:%S')
+            
+            click.echo(f"{level_icon} {status_icon} [{alert.alert_id}] {alert.title}")
+            click.echo(f"    Time: {time_str}")
+            click.echo(f"    Message: {alert.message}")
+            if alert.metadata:
+                click.echo(f"    Details: {alert.metadata}")
+            click.echo()
+        
+    except Exception as e:
+        echo_error(f"Error checking alerts: {e}")
+        click.exit(1)
+
+@cli.command()
+@click.option('--error-id', '-e', help='Resolve specific error by ID')
+@click.option('--all', 'resolve_all', is_flag=True, help='Resolve all active alerts')
+def resolve_alerts(error_id, resolve_all):
+    """Resolve system alerts."""
+    if not error_id and not resolve_all:
+        echo_error("Please specify --error-id or --all")
+        return
+    
+    try:
+        # Create system monitor
+        monitor = SystemMonitor()
+        
+        if resolve_all:
+            # Resolve all active alerts
+            active_alerts = monitor.alert_manager.get_active_alerts()
+            for alert in active_alerts:
+                monitor.alert_manager.resolve_alert(alert.alert_id)
+            echo_success(f"Resolved {len(active_alerts)} alerts")
+        else:
+            # Resolve specific alert
+            monitor.alert_manager.resolve_alert(error_id)
+            echo_success(f"Resolved alert {error_id}")
+        
+    except Exception as e:
+        echo_error(f"Error resolving alerts: {e}")
+        click.exit(1)
+
+@cli.command()
+@click.option('--hours', '-h', type=int, default=24, help='Hours of error history to show')
+@click.option('--category', '-c', type=click.Choice([cat.value for cat in ErrorCategory]), 
+              help='Filter by error category')
+@click.option('--severity', '-s', type=click.Choice([sev.value for sev in ErrorSeverity]), 
+              help='Filter by error severity')
+def error_log(hours, category, severity):
+    """Show error log and statistics."""
+    echo_info(f"Analyzing error log for last {hours} hours...")
+    
+    try:
+        # Create error handler
+        error_handler = ErrorHandler()
+        
+        # Get error summary
+        summary = error_handler.get_error_summary()
+        
+        # Display summary
+        click.echo(f"\n📊 Error Summary (Last 24 hours):")
+        click.echo("-" * 50)
+        click.echo(f"Total Errors: {summary['total_errors']}")
+        click.echo(f"Resolved: {summary['resolved_errors']}")
+        click.echo(f"Unresolved: {summary['unresolved_errors']}")
+        
+        if summary['by_severity']:
+            click.echo(f"\nBy Severity:")
+            for sev, count in summary['by_severity'].items():
+                click.echo(f"  {sev}: {count}")
+        
+        if summary['by_category']:
+            click.echo(f"\nBy Category:")
+            for cat, count in summary['by_category'].items():
+                click.echo(f"  {cat}: {count}")
+        
+        # Show recent errors if log file exists
+        log_file = Path("error_log.json")
+        if log_file.exists():
+            click.echo(f"\n📋 Recent Errors:")
+            click.echo("-" * 80)
+            
+            with open(log_file, 'r') as f:
+                lines = f.readlines()
+                recent_lines = lines[-20:]  # Show last 20 errors
+                
+                for line in recent_lines:
+                    try:
+                        error_data = json.loads(line.strip())
+                        
+                        # Apply filters
+                        if category and error_data.get('category') != category:
+                            continue
+                        if severity and error_data.get('severity') != severity:
+                            continue
+                        
+                        time_str = error_data['timestamp'][:19]  # Remove microseconds
+                        sev_icon = {
+                            'low': '🔵',
+                            'medium': '🟡',
+                            'high': '🟠',
+                            'critical': '🔴'
+                        }.get(error_data.get('severity', 'medium'), '🔵')
+                        
+                        click.echo(f"{sev_icon} [{time_str}] {error_data['category']}: {error_data['error_message']}")
+                        
+                    except json.JSONDecodeError:
+                        continue
+        
+    except Exception as e:
+        echo_error(f"Error analyzing error log: {e}")
+        click.exit(1)
+
+@cli.command()
+@click.option('--start-monitoring', is_flag=True, help='Start background monitoring')
+@click.option('--stop-monitoring', is_flag=True, help='Stop background monitoring')
+@click.option('--status', is_flag=True, help='Show monitoring status')
+def monitor(start_monitoring, stop_monitoring, status):
+    """Manage system monitoring."""
+    if not any([start_monitoring, stop_monitoring, status]):
+        echo_error("Please specify --start-monitoring, --stop-monitoring, or --status")
+        return
+    
+    try:
+        # Create system monitor
+        monitor = SystemMonitor()
+        
+        if start_monitoring:
+            monitor.start_monitoring()
+            echo_success("System monitoring started")
+        elif stop_monitoring:
+            monitor.stop_monitoring()
+            echo_success("System monitoring stopped")
+        elif status:
+            if monitor.monitoring:
+                echo_success("System monitoring is running")
+            else:
+                echo_info("System monitoring is not running")
+        
+    except Exception as e:
+        echo_error(f"Error managing monitoring: {e}")
         click.exit(1)
 
 if __name__ == '__main__':
