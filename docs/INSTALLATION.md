@@ -185,10 +185,16 @@ net stop ReceiptProcessor
    /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
    ```
 
-2. **Install Python**:
+2. **Install Python** (Homebrew installs the latest supported Python 3.11/3.12 build):
    ```bash
-   brew install python@3.9
+   brew install python
    ```
+   After installation, ensure Homebrew’s python is first on your `PATH`:
+   ```bash
+   echo 'eval "$(/opt/homebrew/bin/brew shellenv)"' >> ~/.zprofile
+   eval "$(/opt/homebrew/bin/brew shellenv)"
+   ```
+   You can verify the interpreter with `which python3`.
 
 #### Installation Steps
 
@@ -203,25 +209,16 @@ python3 -m venv venv
 # Activate virtual environment
 source venv/bin/activate
 
-# Install receipt-processor
+# Install receipt-processor (pip should now point at Homebrew's python)
 pip install receipt-processor
 
 # Verify installation
 receipt-processor --version
 ```
 
-#### macOS LaunchAgent Installation
+#### Background Execution
 
-```bash
-# Install as LaunchAgent
-receipt-processor daemon-install --launch-agent
-
-# Load LaunchAgent
-launchctl load ~/Library/LaunchAgents/com.receipt-processor.plist
-
-# Unload LaunchAgent
-launchctl unload ~/Library/LaunchAgents/com.receipt-processor.plist
-```
+Automated LaunchAgent helpers are not yet shipped with the CLI. To run the processor in the background, use macOS tools such as `launchd` or cron with a wrapper script that activates the virtual environment and invokes `receipt-processor start`. See `docs/DEPLOYMENT.md` for manual plist examples.
 
 ### Linux Installation
 
